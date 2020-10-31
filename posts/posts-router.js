@@ -145,4 +145,37 @@ router.delete('/:id', (req, res) => {
 		});
 });
 
+// PUT to /api/posts/:id
+router.put('/:id', (req, res) => {
+	const body = req.body;
+	const { id } = req.params;
+
+	if (body.title && body.contents) {
+		db.findById(id)
+			.then((response) => {
+				if (response.length === 0) {
+					res.status(404).json({
+						message: 'The post with the specified ID does not exist.',
+					});
+				} else {
+					db.update(id, body).then((complete) => {
+						db.findById(id).then((updated) => {
+							res.status(200).json(updated[0]);
+						});
+					});
+				}
+			})
+			.catch((err) => {
+				console.log(err);
+				res
+					.status(500)
+					.json({ error: 'The post information could not be modified.' });
+			});
+	} else {
+		res.status(400).json({
+			errorMessage: 'Please provide title and contents for the post.',
+		});
+	}
+});
+
 module.exports = router;
