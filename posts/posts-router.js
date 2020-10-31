@@ -99,6 +99,7 @@ router.get('/:id', (req, res) => {
 		});
 });
 
+// GET from /api/posts/:id/comments
 router.get('/:id/comments', (req, res) => {
 	const { id } = req.params;
 
@@ -119,6 +120,28 @@ router.get('/:id/comments', (req, res) => {
 			res
 				.status(500)
 				.json({ error: 'The comments information could not be retrieved.' });
+		});
+});
+
+// DELETE from /:id
+router.delete('/:id', (req, res) => {
+	const { id } = req.params;
+
+	db.findById(id)
+		.then((response) => {
+			if (response.length === 0) {
+				res
+					.status(404)
+					.json({ message: 'The post with the specified ID does not exist.' });
+			} else {
+				db.remove(id).then((deleted) => {
+					res.status(204).end();
+				});
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+			res.status(500).json({ error: 'The post could not be removed' });
 		});
 });
 
